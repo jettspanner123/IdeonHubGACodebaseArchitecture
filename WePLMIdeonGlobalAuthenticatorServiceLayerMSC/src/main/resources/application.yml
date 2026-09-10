@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: weplm-global-authenticator-service
+
+  datasource:
+    url: ${WEPLM_AUTHENTICATOR_DATABASE_URL:jdbc:postgresql://localhost:5432/weplm_authenticator}
+    username: ${WEPLM_AUTHENTICATOR_DATABASE_USERNAME:postgres}
+    password: ${WEPLM_AUTHENTICATOR_DATABASE_PASSWORD:postgres}
+
+  jpa:
+    hibernate:
+      ddl-auto: ${WEPLM_AUTHENTICATOR_DATABASE_SEED:update}
+    open-in-view: false
+
+  jackson:
+    property-naming-strategy: UPPER_CAMEL_CASE
+
+server:
+  port: ${PORT:${SERVER_PORT:8080}}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+weplm:
+  authenticator:
+    jwt:
+      secret: ${WEPLM_AUTHENTICATOR_JWT_SECRET:}
+      expiration-ms: ${WEPLM_AUTHENTICATOR_JWT_EXPIRATION_MS:3600000}
+    security:
+      cors:
+        allowed-origins: ${WEPLM_AUTHENTICATOR_CORS_ALLOWED_ORIGINS:http://localhost:3000}

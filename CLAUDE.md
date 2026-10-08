@@ -45,10 +45,10 @@ This project is indexed by GitNexus as **WePLMIdeonGlobalAuthenticationCodebaseA
 
 ## Service Coding Conventions
 
-- **MUST follow that service's `CODING-RULES.md`** before writing any code in it (e.g. `WePLMIdeonGlobalAuthenticatorServiceLayerMSC/CODING-RULES.md`).
+- **MUST follow that service's `CODING-RULES.md`** before writing any code in it (e.g. `IdeonHubGAServiceLayerMSC/CODING-RULES.md`).
 - **MUST stop and ask the user** when a case isn't covered there — never assume or invent a convention it doesn't state.
 
 ## Documentation Conventions
 
-- ADRs live in `WePLMIdeonGlobalAuthenticatorDocumentationNMSC/ADR/`, not `docs/adr/`.
+- ADRs live in `IdeonHubGADocumentationNMSC/ADR/`, not `docs/adr/`.
 - **MUST name every file in that folder (and documentation files generally) in SCREAMING_SNAKE_CASE** (e.g. `SPRING_SECURITY_JWT_OVER_HAND_ROLLED_AUTH.md`), with **no leading number** — this overrides the generic ADR skill's default `0001-slug.md` numbering.

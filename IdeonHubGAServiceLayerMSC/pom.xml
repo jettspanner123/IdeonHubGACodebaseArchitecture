@@ -11,11 +11,11 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.weplm.authenticator</groupId>
-    <artifactId>weplm-global-authenticator-service</artifactId>
+    <groupId>com.weplm.ga</groupId>
+    <artifactId>ideonhub-ga-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>WePLMIdeonGlobalAuthenticatorServiceLayerMSC</name>
-    <description>WePLM Ideon Global Authentication Service (Spring Boot 3.4 / Java 21)</description>
+    <name>IdeonHubGAServiceLayerMSC</name>
+    <description>IdeonHub GA — Global Authenticator Service (Spring Boot 3.4 / Java 21)</description>
 
     <properties>
         <java.version>21</java.version>

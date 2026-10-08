@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GAuth Architecture</title>
+<title>GA Architecture</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter+Tight:wght@400;500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -238,7 +238,7 @@
   <div class="wrap">
     <div class="brand">
       <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2 4 5v6c0 5 3.4 8.7 8 10 4.6-1.3 8-5 8-10V5l-8-3Z" fill="#000"/></svg></span>
-      GAuth
+      GA
     </div>
     <div class="nav-links">
       <a href="#problem">Problem</a>
@@ -255,12 +255,12 @@
 
 <header class="hero">
   <div class="wrap">
-    <div class="eyebrow">WePLM Ideon · Internal Engineering Reference</div>
+    <div class="eyebrow">IdeonHub · Internal Engineering Reference</div>
     <h1>One login.<br>Every <em>internal tool</em>.</h1>
     <p class="hero-sub">
       Today, SignForge and AssetSphere each hand-roll their own login, their own JWT secret, and their own user table — and neither
-      knows the other exists. This is the architecture for the <strong style="color:var(--ink); font-weight:600;">Global
-      Authenticator (GAuth)</strong>: a single, standards-based identity provider that any Client Application — a web app, a CLI, a
+      knows the other exists. This is the architecture for <strong style="color:var(--ink); font-weight:600;">GA</strong>, the
+      Global Authenticator: a single, standards-based identity provider that any Client Application — a web app, a CLI, a
       desktop app, or a mobile app — can redirect to, and get a logged-in user back from.
     </p>
     <div class="hero-meta">
@@ -314,16 +314,16 @@
 
 <section id="architecture">
   <div class="wrap">
-    <div class="kicker">The shape of GAuth</div>
+    <div class="kicker">The shape of GA</div>
     <h2 class="sec-title">One issuer, a registry of clients, everyone else on the outside</h2>
     <p class="sec-lead">
-      GAuth doesn't embed itself into SignForge or AssetSphere's code. It sits beside them as its own service, holding its own
+      GA doesn't embed itself into SignForge or AssetSphere's code. It sits beside them as its own service, holding its own
       login page and its own list of who's allowed to ask it for a token. A Client Application never sees a password — it only
       ever gets redirected away, and redirected back with proof.
     </p>
 
     <figure class="diagram-frame">
-      <svg viewBox="0 0 900 420" role="img" aria-label="GAuth sits as a central identity provider. SignForge and AssetSphere are drawn as planned client applications connected by dashed lines, since neither is wired up yet. A ghost node represents future CLI, desktop, and mobile clients.">
+      <svg viewBox="0 0 900 420" role="img" aria-label="GA sits as a central identity provider. SignForge and AssetSphere are drawn as planned client applications connected by dashed lines, since neither is wired up yet. A ghost node represents future CLI, desktop, and mobile clients.">
         <defs>
           <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
             <polygon points="0 0, 8 4, 0 8" fill="var(--blue)"/>
@@ -341,9 +341,9 @@
         <text x="300" y="298" font-family="Inter, sans-serif" font-size="11" fill="var(--mute)" text-anchor="middle">device / loopback flow</text>
         <text x="600" y="298" font-family="Inter, sans-serif" font-size="11" fill="var(--mute)" text-anchor="middle">custom-scheme flow</text>
 
-        <!-- GAuth hub -->
+        <!-- GA hub -->
         <rect x="350" y="180" width="200" height="80" rx="14" fill="var(--surface-elevated)" stroke="var(--blue)" stroke-width="1.6"/>
-        <text x="450" y="212" font-family="Fraunces, serif" font-size="18" fill="var(--ink)" text-anchor="middle">GAuth</text>
+        <text x="450" y="212" font-family="Fraunces, serif" font-size="18" fill="var(--ink)" text-anchor="middle">GA</text>
         <text x="450" y="232" font-family="Inter, sans-serif" font-size="10.5" fill="var(--charcoal)" text-anchor="middle">OIDC provider · client registry</text>
 
         <!-- SignForge -->
@@ -367,7 +367,7 @@
         <text x="680" y="350" font-family="Inter, sans-serif" font-size="10" fill="var(--stone)" text-anchor="middle">future client — not built</text>
       </svg>
     </figure>
-    <figcaption>Target architecture. Every connection is dashed because none is wired up today — GAuth is being built standalone first, deliberately, so nothing in production is touched until it's ready.</figcaption>
+    <figcaption>Target architecture. Every connection is dashed because none is wired up today — GA is being built standalone first, deliberately, so nothing in production is touched until it's ready.</figcaption>
   </div>
 </section>
 
@@ -391,29 +391,29 @@
     <div class="flow-panel active" data-panel="web">
       <div class="flow-head"><h3>Authorization Code + PKCE</h3><span class="rfc-badge">RFC 6749 §4.1 + RFC 7636</span></div>
       <div class="seq">
-        <div class="seq-step"><div class="seq-actor">Client Application</div><p>User clicks "Sign in." The app generates a random <code>code_verifier</code>, derives a <code>code_challenge</code> (SHA-256), and redirects the browser to GAuth's <code>/authorize</code> with the challenge attached.</p></div>
-        <div class="seq-step"><div class="seq-actor">GAuth</div><p>Shows the login page. If a valid GAuth session cookie already exists, this step is skipped silently — that's what makes hopping between client apps feel frictionless without ever sharing a session across them.</p></div>
-        <div class="seq-step"><div class="seq-actor">GAuth</div><p>On success, redirects back to the client's registered <code>redirect_uri</code> with a short-lived, single-use authorization <code>code</code>.</p></div>
-        <div class="seq-step"><div class="seq-actor">Client Application</div><p>Exchanges the <code>code</code> plus the original <code>code_verifier</code> at GAuth's <code>/token</code> endpoint — server-side, never in the browser — for an access token, refresh token, and ID token.</p></div>
+        <div class="seq-step"><div class="seq-actor">Client Application</div><p>User clicks "Sign in." The app generates a random <code>code_verifier</code>, derives a <code>code_challenge</code> (SHA-256), and redirects the browser to GA's <code>/authorize</code> with the challenge attached.</p></div>
+        <div class="seq-step"><div class="seq-actor">GA</div><p>Shows the login page. If a valid GA session cookie already exists, this step is skipped silently — that's what makes hopping between client apps feel frictionless without ever sharing a session across them.</p></div>
+        <div class="seq-step"><div class="seq-actor">GA</div><p>On success, redirects back to the client's registered <code>redirect_uri</code> with a short-lived, single-use authorization <code>code</code>.</p></div>
+        <div class="seq-step"><div class="seq-actor">Client Application</div><p>Exchanges the <code>code</code> plus the original <code>code_verifier</code> at GA's <code>/token</code> endpoint — server-side, never in the browser — for an access token, refresh token, and ID token.</p></div>
       </div>
     </div>
 
     <div class="flow-panel" data-panel="cli">
       <div class="flow-head"><h3>Device Authorization Grant</h3><span class="rfc-badge">RFC 8628</span></div>
       <div class="seq">
-        <div class="seq-step"><div class="seq-actor">Client Application</div><p>The CLI has no browser and no redirect URI to receive. It calls GAuth's <code>/device_authorization</code> endpoint directly and gets back a short <code>user_code</code> plus a verification URL.</p></div>
-        <div class="seq-step"><div class="seq-actor">Client Application</div><p>Prints: "Go to <code>gauth.weplm.com/device</code> and enter code <code>WQXR-4KTL</code>." The user does this on any other device with a browser.</p></div>
-        <div class="seq-step"><div class="seq-actor">Client Application</div><p>Meanwhile, the CLI polls GAuth's <code>/token</code> endpoint on an interval, asking "has this code been approved yet?"</p></div>
-        <div class="seq-step"><div class="seq-actor">GAuth</div><p>Once the user approves on the verification page, the next poll returns the access, refresh, and ID tokens directly to the CLI process.</p></div>
+        <div class="seq-step"><div class="seq-actor">Client Application</div><p>The CLI has no browser and no redirect URI to receive. It calls GA's <code>/device_authorization</code> endpoint directly and gets back a short <code>user_code</code> plus a verification URL.</p></div>
+        <div class="seq-step"><div class="seq-actor">Client Application</div><p>Prints: "Go to <code>ga.weplm.com/device</code> and enter code <code>WQXR-4KTL</code>." The user does this on any other device with a browser.</p></div>
+        <div class="seq-step"><div class="seq-actor">Client Application</div><p>Meanwhile, the CLI polls GA's <code>/token</code> endpoint on an interval, asking "has this code been approved yet?"</p></div>
+        <div class="seq-step"><div class="seq-actor">GA</div><p>Once the user approves on the verification page, the next poll returns the access, refresh, and ID tokens directly to the CLI process.</p></div>
       </div>
     </div>
 
     <div class="flow-panel" data-panel="desktop">
       <div class="flow-head"><h3>Loopback Redirect + PKCE</h3><span class="rfc-badge">RFC 8252 §7.3</span></div>
       <div class="seq">
-        <div class="seq-step"><div class="seq-actor">Client Application</div><p>The desktop app opens an ephemeral local port (e.g. <code>127.0.0.1:51204</code>) and registers it as the redirect URI for this login attempt — GAuth must accept any port on loopback, since the OS assigns it at request time.</p></div>
-        <div class="seq-step"><div class="seq-actor">Client Application</div><p>Opens the user's system browser to GAuth's <code>/authorize</code> with a PKCE challenge, same as the web flow.</p></div>
-        <div class="seq-step"><div class="seq-actor">GAuth</div><p>After login, redirects the system browser back to <code>http://127.0.0.1:51204/callback?code=...</code> — landing on the desktop app's own tiny local server, not a website.</p></div>
+        <div class="seq-step"><div class="seq-actor">Client Application</div><p>The desktop app opens an ephemeral local port (e.g. <code>127.0.0.1:51204</code>) and registers it as the redirect URI for this login attempt — GA must accept any port on loopback, since the OS assigns it at request time.</p></div>
+        <div class="seq-step"><div class="seq-actor">Client Application</div><p>Opens the user's system browser to GA's <code>/authorize</code> with a PKCE challenge, same as the web flow.</p></div>
+        <div class="seq-step"><div class="seq-actor">GA</div><p>After login, redirects the system browser back to <code>http://127.0.0.1:51204/callback?code=...</code> — landing on the desktop app's own tiny local server, not a website.</p></div>
         <div class="seq-step"><div class="seq-actor">Client Application</div><p>The local listener grabs the code, exchanges it for tokens, shows "You're signed in — you can close this tab," and shuts the port down.</p></div>
       </div>
     </div>
@@ -421,9 +421,9 @@
     <div class="flow-panel" data-panel="mobile">
       <div class="flow-head"><h3>Custom Scheme / App Link + PKCE</h3><span class="rfc-badge">RFC 8252 §7.1–7.2</span></div>
       <div class="seq">
-        <div class="seq-step"><div class="seq-actor">Client Application</div><p>The app registers a claimed redirect target with GAuth — either a custom scheme (<code>weplm-authenticator://callback</code>) or, preferably, an HTTPS App Link/Universal Link it can prove it owns.</p></div>
+        <div class="seq-step"><div class="seq-actor">Client Application</div><p>The app registers a claimed redirect target with GA — either a custom scheme (<code>weplm-ga://callback</code>) or, preferably, an HTTPS App Link/Universal Link it can prove it owns.</p></div>
         <div class="seq-step"><div class="seq-actor">Client Application</div><p>Opens the login screen in the device's system browser or an in-app secure tab (never an embedded WebView — that can't be trusted with the password field), with a PKCE challenge attached.</p></div>
-        <div class="seq-step"><div class="seq-actor">GAuth</div><p>After login, redirects to the registered scheme or App Link, which the OS hands straight back to the mobile app.</p></div>
+        <div class="seq-step"><div class="seq-actor">GA</div><p>After login, redirects to the registered scheme or App Link, which the OS hands straight back to the mobile app.</p></div>
         <div class="seq-step"><div class="seq-actor">Client Application</div><p>Exchanges the code + verifier for tokens and stores them in the platform's secure storage (Keychain / Keystore), never in plain files.</p></div>
       </div>
     </div>
@@ -432,11 +432,11 @@
 
 <section id="tokens">
   <div class="wrap">
-    <div class="kicker">What GAuth actually issues</div>
+    <div class="kicker">What GA actually issues</div>
     <h2 class="sec-title">Three tokens, three jobs, none of them static</h2>
     <p class="sec-lead">
       SignForge and AssetSphere both hand out one long-lived refresh token per user that's never replaced until it expires.
-      GAuth rotates on every use — a stolen refresh token stops working the moment its legitimate owner refreshes again.
+      GA rotates on every use — a stolen refresh token stops working the moment its legitimate owner refreshes again.
     </p>
 
     <div class="token-grid">
@@ -444,7 +444,7 @@
         <div class="cw-head"><span class="cwd" style="background:var(--red)"></span><span class="cwd" style="background:var(--yellow)"></span><span class="cwd" style="background:var(--green)"></span><span class="cw-title">access_token.jwt</span></div>
         <pre>{
   <span class="tok-key">"sub"</span>: <span class="tok-str">"usr_8f2c…"</span>,
-  <span class="tok-key">"iss"</span>: <span class="tok-str">"https://gauth.weplm.com"</span>,
+  <span class="tok-key">"iss"</span>: <span class="tok-str">"https://ga.weplm.com"</span>,
   <span class="tok-key">"aud"</span>: <span class="tok-str">"signforge-web"</span>,
   <span class="tok-key">"role"</span>: <span class="tok-str">"HR_MANAGER"</span>,
   <span class="tok-key">"exp"</span>: <span class="tok-num">1799999999</span>
@@ -480,8 +480,8 @@
     <h2 class="sec-title">Every Client Application is a row, not a guess</h2>
     <p class="sec-lead">
       Instead of a static allowlist buried in config, each Client Application — SignForge's web app, AssetSphere's web app,
-      tomorrow's CLI — is a registered row GAuth checks on every request. New clients get added by inserting a row, not
-      redeploying GAuth.
+      tomorrow's CLI — is a registered row GA checks on every request. New clients get added by inserting a row, not
+      redeploying GA.
     </p>
     <div class="table-wrap">
       <div class="reg-table">
@@ -499,8 +499,8 @@
 <section id="security">
   <div class="wrap">
     <div class="kicker">Why this matters now</div>
-    <h2 class="sec-title">GAuth exists because these are live, not hypothetical</h2>
-    <p class="sec-lead">Found while researching this document, in the current production code — not GAuth's problem to fix directly, but exactly the pattern GAuth is designed to not repeat.</p>
+    <h2 class="sec-title">GA exists because these are live, not hypothetical</h2>
+    <p class="sec-lead">Found while researching this document, in the current production code — not GA's problem to fix directly, but exactly the pattern GA is designed to not repeat.</p>
 
     <div class="findings">
       <div class="finding">
@@ -552,9 +552,9 @@
 <section id="rollout">
   <div class="wrap">
     <div class="kicker">Rollout, phase by phase</div>
-    <h2 class="sec-title">GAuth gets built once, connected gradually</h2>
+    <h2 class="sec-title">GA gets built once, connected gradually</h2>
     <p class="sec-lead">
-      SignForge and AssetSphere are production apps — nothing about their login changes until GAuth is ready to be trusted with it.
+      SignForge and AssetSphere are production apps — nothing about their login changes until GA is ready to be trusted with it.
     </p>
     <div class="phases">
       <div class="phase now">
@@ -565,18 +565,18 @@
       </div>
       <div class="phase">
         <div class="ph-num">Phase 1</div>
-        <h4>Build GAuth standalone</h4>
+        <h4>Build GA standalone</h4>
         <p>Login page, client registry, <code style="font-family:var(--code);">/authorize</code> · <code style="font-family:var(--code);">/token</code> · <code style="font-family:var(--code);">/device_authorization</code>, JWKS + discovery doc. Zero changes to SignForge or AssetSphere.</p>
       </div>
       <div class="phase">
         <div class="ph-num">Phase 2</div>
         <h4>Register real clients</h4>
-        <p>Add SignForge and AssetSphere as registered clients. Each gets a "Sign in with GAuth" option alongside — not replacing — its existing login.</p>
+        <p>Add SignForge and AssetSphere as registered clients. Each gets a "Sign in with GA" option alongside — not replacing — its existing login.</p>
       </div>
       <div class="phase">
         <div class="ph-num">Phase 3</div>
         <h4>Consolidate identity</h4>
-        <p>GAuth becomes the source of truth for user profile and role. Local user tables in SignForge and AssetSphere are migrated to reference it, then retired.</p>
+        <p>GA becomes the source of truth for user profile and role. Local user tables in SignForge and AssetSphere are migrated to reference it, then retired.</p>
       </div>
     </div>
   </div>
@@ -585,7 +585,7 @@
 <footer>
   <div class="wrap">
     <div class="foot-row">
-      <span>WePLMIdeonGlobalAuthenticatorServiceLayerMSC · Architecture reference, Phase 0</span>
+      <span>IdeonHubGAServiceLayerMSC · Architecture reference, Phase 0</span>
       <span><a href="#problem">Back to top ↑</a></span>
     </div>
   </div>

@@ -1,12 +1,12 @@
-package com.weplm.authenticator;
+package com.weplm.ga;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class WePLMIdeonGlobalAuthenticatorApplication {
+public class IdeonHubGAApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(WePLMIdeonGlobalAuthenticatorApplication.class, args);
+        SpringApplication.run(IdeonHubGAApplication.class, args);
     }
 }

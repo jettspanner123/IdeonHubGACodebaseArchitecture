@@ -111,10 +111,10 @@ All request payloads and response bodies serialized or deserialized across the A
 ### Assertion Definition:
 
 ```java
-package com.weplm.authenticator.Features.Authentication.Assertion;
+package com.weplm.ga.Features.Authentication.Assertion;
 
-import com.weplm.authenticator.Exceptions.ValidationCException;
-import com.weplm.authenticator.Features.Authentication.Models.LoginRequestDTO;
+import com.weplm.ga.Exceptions.ValidationCException;
+import com.weplm.ga.Features.Authentication.Models.LoginRequestDTO;
 
 import java.util.Collections;
 
